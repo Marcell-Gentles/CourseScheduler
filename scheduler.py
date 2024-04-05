@@ -40,6 +40,7 @@ def makeSchedules(existingSchedule: Schedule,
                   coursesToAdd: list[list[Section]]) -> list[Schedule]:
     """
     Make a list of schedules that contain each course no more than one time.
+    No schedule will be made that does not include the mandatory courses.
     """
     if coursesToAdd == []:
         return [existingSchedule]
