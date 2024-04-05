@@ -44,7 +44,6 @@ Paginated browsing of sorted schedules with informative summaries of variable le
 * Time (start of first class, end of last)
 * Prioritization score
 * Courses included/excluded
-    * Filter includes mandatory courses by default
 * Individual sections
     * Included (say I want to be in my friend’s class)
     * Excluded (a section fills up)
