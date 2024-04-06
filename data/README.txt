@@ -16,3 +16,86 @@ sortedSchedules.json
 The sorted list of schedules, which is hopefully only generated one time, or
 maybe regenerated whenever the user thinks of new courses/sections they may
 want. Most of the utility then comes from filtering and browsing this list.
+See expanded.json for an example of how a schedule is represented in JSON.
+In the "sections" field is an array of course objects.
+
+Schedule:
+{
+    "sections": [
+        <sections>
+    ],
+    "score": <score>,
+    "start time": [
+        <hour>,
+        <minute>
+    ],
+    "end time": [
+        <hour>,
+        <minute>
+    ]
+}
+
+Section:
+{
+    "course": <course code>,
+    "section": <section campus/number>,
+    "days": [
+        <days>
+    ],
+    "start time": [
+        <hour>,
+        <minute>
+    ],
+    "end time": [
+        <hour>,
+        <minute>
+    ]
+}
+
+The following is an example schedule. The sortedSchedules file should contain
+an array of these.
+
+{
+  "sections": [
+    {
+      "course": "ENGR079",
+      "section": "07",
+      "days": [
+        "M",
+        "W"
+      ],
+      "start time": [
+        11,
+        0
+      ],
+      "end time": [
+        11,
+        50
+      ]
+    },
+    {
+      "course": "ENGR079P",
+      "section": "08",
+      "days": [
+        "F"
+      ],
+      "start time": [
+        15,
+        0
+      ],
+      "end time": [
+        17,
+        30
+      ]
+    }
+  ],
+  "score": 0,
+  "start time": [
+    11,
+    0
+  ],
+  "end time": [
+    17,
+    30
+  ]
+}

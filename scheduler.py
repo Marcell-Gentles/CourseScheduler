@@ -1,6 +1,10 @@
 from dataTypes import Schedule, Section
 from io import TextIOWrapper
 import datetime
+import os
+
+JSON_WRITE_PATH = os.path.join('data', 'sortedSchedules.json')
+COURSE_DATA_PATH = os.path.join('data', 'courseData.txt')
 
 def readSections(f: TextIOWrapper) -> dict[str, list[Section]]:
     """
@@ -73,7 +77,7 @@ def getSortedSchedules() -> list[Schedule]:
     starter parameters
     """
     # get sections from text file
-    with open('data/courseData.txt', 'r') as f:
+    with open(COURSE_DATA_PATH, 'r') as f:
         sections = list(readSections(f).values())
     # start off the recursive schedule generation
     blankSchedule = Schedule()
@@ -87,7 +91,7 @@ def getSortedSchedules() -> list[Schedule]:
 def writeJSON():
     import json
     schedules = getSortedSchedules()
-    with open('data/sortedSchedules.json', 'w') as f:
+    with open(JSON_WRITE_PATH, 'w') as f:
         json.dump([schedule.toDictionary() for schedule in schedules], f)
 
 if __name__ == "__main__":
