@@ -71,4 +71,4 @@ Also, Hyperschedule is far better as a course browser than Harvey Mudd's portal,
 5. Browser
 6. Persistent filtering (section exclusion)
 
-As of this commit, 1.1, 4, 5, and 6 remain.
+As of this commit, 4, 5, and 6 remain.

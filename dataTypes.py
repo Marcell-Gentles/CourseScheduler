@@ -1,5 +1,7 @@
 from datetime import time
 from priorities import PRIORITY_D
+import json
+from io import TextIOWrapper
 
 class Schedule:
     """
@@ -61,22 +63,63 @@ class Schedule:
         for section in self.sections:
             if PRIORITY_D[section.course] != 0:
                 self.score += float(1 / PRIORITY_D[section.course])
+    
+    def toDictionary(self) -> dict:
+        """helper function for JSON"""
+        # make time interpretable as JSON array
+        startTime = [self.startTime.hour, self.startTime.minute]
+        endTime = [self.endTime.hour, self.endTime.minute]
+        # make properties interpretable as JSON
+        d = {'sections' : [section.toDictionary()
+                           for section in self.sections],
+             'score' : self.score,
+             'start time' : startTime,
+             'end time' : endTime}
+        return d
 
-    # def conflictsWith(self, section: Section):
-    #     """Alternate way to check for conflicts"""
-    #     return section.conflictsWith(self)
+    def toJSON(self, f: None | TextIOWrapper = None):
+        """
+        Creates a JSON object from a schedule object and returns it or
+        writes it to the opened file object f, if given.
+        """
+        s = json.dumps(self.toDictionary(), indent=2)
+        if f:
+            f.write(s)
+        else:
+            return s
+    
+    @classmethod
+    def fromJSON(cls, src: TextIOWrapper | str):
+        """Returns a schedule object from a json object"""
+        # convert to string if necessary and then turn into dictionary
+        if type(src) == TextIOWrapper:
+            src = src.read()
+        # TODO: unpack sections from JSON
+        d = json.loads(src)
+        d['sections'] = [Section.fromJSON(jsonSection)
+                         for jsonSection in d['sections']]
+        # recover times as time objects
+        startTime = d['start time']
+        startTime = time(startTime[0], startTime[1])
+        endTime = d['end time']
+        endTime = time(endTime[0], endTime[1])
+        # instantiate object and return
+        args = [d['sections'], d['score'], startTime, endTime]
+        return cls(*args)
+
+
 
 class Section:
     """
     Represents a section of a course, with course code, section number
     (and campus if applicable), and meeting days and times
     """
-    def __init__(self, course, section, days, time) -> None:
+    def __init__(self, course, section, days, times) -> None:
         self.course = course        # str
         self.section = section      # str
         self.days = days            # list[str]
-        self.startTime = time[0]    # time
-        self.endTime = time[1]      # time
+        self.startTime: time = times[0]    # time
+        self.endTime: time = times[1]      # time
     
     def __repr__(self):
         if len(self.section) < 3:
@@ -127,3 +170,44 @@ class Section:
     
     def isRedundant(self, schedule: Schedule) -> bool:
         return self.course in [sec.course for sec in schedule.sections]
+    
+    def toDictionary(self) -> dict:
+        """helper function for JSON"""
+        # make time interpretable as JSON array
+        startTime = [self.startTime.hour, self.startTime.minute]
+        endTime = [self.endTime.hour, self.endTime.minute]
+        # make properties interpretable as JSON
+        d = {'course' : self.course,
+             'section' : self.section,
+             'days' : self.days,
+             'start time' : startTime,
+             'end time' : endTime}
+        return d
+
+    def toJSON(self, f: None | TextIOWrapper = None):
+        """
+        Creates a JSON object from a section object and returns it or
+        writes it to the opened file object f, if given.
+        """
+        s = json.dumps(self.toDictionary(), indent=2)
+        if f:
+            f.write(s)
+        else:
+            return s
+    
+    @classmethod
+    def fromJSON(cls, src: TextIOWrapper | str):
+        """Returns a section object from a json object"""
+        # convert to string if necessary and then turn into dictionary
+        if type(src) == TextIOWrapper:
+            src = src.read()
+        d = json.loads(src)
+        # recover times as time objects
+        startTime = d['start time']
+        startTime = time(startTime[0], startTime[1])
+        endTime = d['end time']
+        endTime = time(endTime[0], endTime[1])
+        # instantiate object and return
+        args = [d['course'], d['section'], d['days'], [startTime, endTime]]
+        return cls(*args)
+

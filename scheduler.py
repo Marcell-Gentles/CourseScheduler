@@ -15,13 +15,15 @@ def readSections(f: TextIOWrapper) -> dict[str, list[Section]]:
         02 MW 1100-1215
         03 MW 1445-1600
     """
-    sections = {}
+    sections: dict[str, list[Section]] = {}
     line = f.readline()
     while line != "":   # otherwise EOF
         if line != '\n':    # otherwise empty line
+
             if line[0] != ' ':  # course title with no indent
                 course = line.strip()
                 sections[course] = []
+
             else:   # indented section line under course line
                 sectionData = line.split()
                 section = sectionData[0]
@@ -33,8 +35,10 @@ def readSections(f: TextIOWrapper) -> dict[str, list[Section]]:
                 endTime = datetime.time(int(endTime[0:2]), int(endTime[2:4]))
                 time = [startTime, endTime]
                 sections[course].append(Section(course, section, days, time))
+
         line = f.readline()
     return sections
+
 
 def makeSchedules(existingSchedule: Schedule,
                   coursesToAdd: list[list[Section]]) -> list[Schedule]:
@@ -42,31 +46,47 @@ def makeSchedules(existingSchedule: Schedule,
     Make a list of schedules that contain each course no more than one time.
     No schedule will be made that does not include the mandatory courses.
     """
-    if coursesToAdd == []:
+    if coursesToAdd == []:          # bottom of recursion
         return [existingSchedule]
     
+    # each subtree includes one of the sections of that course
     newSchedules = []
     for section in coursesToAdd[0]: # from the current course group to add
         if not section.conflictsWith(existingSchedule):
+            # add to the list all of the schedules that can be made by
+            # including that section
+            # this relies on add not being in place
             newSchedules += makeSchedules(existingSchedule.add(section),
                                           coursesToAdd[1:])
-    # we also consider not adding the course, unless mandatory
+    # we also consider not adding the course at all, unless mandatory
     if not section.isMandatory():
         newSchedules += makeSchedules(existingSchedule, coursesToAdd[1:])
+    # now we have reached the end of the recursion and newSchedules has
+    # every possible schedule
     return newSchedules
 
-def getSortedSchedules():
+
+def getSortedSchedules() -> list[Schedule]:
+    """
+    Facilitates the generation of schedules by getting sections from
+    courseData.txt and then wrapping the recursive makeSchedules with
+    starter parameters
+    """
+    # get sections from text file
     f = open('courseData.txt', 'r')
     sections = list(readSections(f).values())
     f.close()
-
+    # start off the recursive schedule generation
     blankSchedule = Schedule()
     schedules = makeSchedules(blankSchedule, sections)
+    # remove empty schedules and sort them by score
+    schedules = list(filter(lambda x : len(x.sections) > 0, schedules))
     schedules.sort(key = lambda sched : sched.score, reverse = True)
-
     return schedules
 
+
 def main():
+    """not at all the final main function. this is more for testing right now"""
     schedules = getSortedSchedules()
     perfectScore = schedules[0].score
     print("Number of perfect schedules: {}\n".format(len([schedule for schedule in schedules
@@ -76,4 +96,7 @@ def main():
         print()
     
 
-main()
+def writeJSON():
+    schedules = getSortedSchedules()
+    with open('sortedSchedules.json', 'w') as f:
+        json.dump([schedule.toDictionary() for schedule in schedules], f, indent=2)
