@@ -35,23 +35,15 @@ In `data/priorities.py` is a dictionary where you can set the priority of each c
 
 As of this commit, there is functionality to generate the list of all possible schedules, sorted by prioritization score (where a higher score is better). In the future, I plan to add prioritization at the section level, so you can prefer a certain professor or even campus.
 
-I plan to add the following features before course registration day (April 18, 2024 for me, a freshman).
+There is filtering functionality so that you can filter by the earliest class start time, latest clast end time, minimum score, courses included or excluded, and sections included or excluded. These filters can be saved and reloaded.
 
-### Browsing
-Paginated browsing of sorted schedules with informative summaries of variable levels of detail
 
-### Filtering
-* Time (start of first class, end of last)
-* Prioritization score
-* Courses included/excluded
-* Individual sections
-    * Included (say I want to be in my friend’s class)
-    * Excluded (a section fills up)
-        * Persistent exclusion list for keeping track of full sections during registration
+### Front End
+
+I plan to improve the user experience for inputting section and course information, and to provide paginated and filtered browsing of sorted schedules with informative summaries of variable levels of detail
 
 
 ## Future
-As soon as possible, I would like to improve the UI. The way I have required the course data be provided is not great, and the browsing should be smooth. First I will improve the terminal-based experience then maybe build an HTML / JS interface.
 
 Long-term, I hope to be able to add this functionality to [HyperSchedule](https://github.com/hyperschedule/hyperschedule) for the following reasons.
 
@@ -60,15 +52,3 @@ Long-term, I hope to be able to add this functionality to [HyperSchedule](https:
 * **Automatic section exclusion**: Once a section fills up, Hyperschedule could automatically filter out all of the schedules that include that section, without the user having to try to add that section, only to find that it is full and then frantically provide that information and repeat the same process for any new sections they find have filled up.
 
 Also, Hyperschedule is far better as a course browser than Mudd's portal, and this feature would make it even better. I am a big fan of having one application that does everything you want it to instead of several that depend on one another.
-
-
-## Implementation Roadmap
-1. Section and Schedule classes
-    1. methods to export to JSON and import from JSON
-2. schedule generator
-3. Design and implement scoring
-4. Filtering predicate generators
-5. Browser
-6. Persistent filtering (section exclusion)
-
-As of this commit, 4, 5, and 6 remain.

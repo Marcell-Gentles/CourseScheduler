@@ -16,7 +16,6 @@ sortedSchedules.json
 The sorted list of schedules, which is hopefully only generated one time, or
 maybe regenerated whenever the user thinks of new courses/sections they may
 want. Most of the utility then comes from filtering and browsing this list.
-See expanded.json for an example of how a schedule is represented in JSON.
 In the "sections" field is an array of course objects.
 
 Schedule:
@@ -52,7 +51,7 @@ Section:
     ]
 }
 
-The following is an example schedule. The sortedSchedules file should contain
+The following is an example schedule. sorted_schedules.json should contain
 an array of these.
 
 {

@@ -1,6 +1,9 @@
 from datetime import time
 from datatypes import Schedule, Section
 from typing import Callable
+import json
+from io import TextIOWrapper
+
 
 def make_filter(kind: str, *args, **kwargs) -> Callable:
     """Returns a filter predicate to filter schedules.
@@ -80,11 +83,59 @@ def make_filter(kind: str, *args, **kwargs) -> Callable:
     
     raise ValueError("'{}' is not an allowed kind of filter.".format(kind))
 
+
 def layer_filters(*filters: Callable) -> Callable:
     """Layers filters so that all must be satisfied to pass through."""
-    # I start by creating a 'filter' that accpets anything.
-    predicate = lambda schedule: True
-    # Then I iteritively add each filter to that one
-    for filter in filters:
-        predicate = lambda schedule: predicate(schedule) and filter(schedule)
+    def predicate(schedule: Schedule):
+        for filter in filters:      # Test each filter to pass all of them
+            if not filter(schedule):
+                return False
+        return True
     return predicate
+
+
+class Filterer:
+    """A class to maintain information about the filtering happening in
+    the user's browsing session.
+    """
+    def __init__(self):
+        self.filter = lambda schedule: True
+        self.filters: list[tuple[Callable, dict[str, str|list|dict]]] = []
+         
+    def add(self, kind: str, args: list, kwargs: dict):
+        """Add an active filter."""
+        predicate = make_filter(kind, *args, **kwargs)
+        self.filters.append((predicate,
+                            {'kind': kind,
+                             'args': args,
+                             'kwargs': kwargs}))
+        self.filter = layer_filters(self.filter, predicate)
+
+    def remove(self, filter_info: dict[str, str|list|dict]):
+        """Remove from the active filters."""
+        for i, filter in enumerate(self.filters):
+            if filter[1] == filter_info:
+                del(self.filters[i])
+                break
+        self.filter = layer_filters(*[pair[0] for pair in self.filters])
+
+    # add optional file writing handled by the function (json.dump)
+    def toJSON(self, f: TextIOWrapper | None = None) -> str | None:
+        """Serialize the active filters."""
+        info = [pair[1] for pair in self.filters]
+        if f is not None:
+            json.dump(info, f)
+        else:
+            return json.dumps(info)
+
+    @classmethod
+    def fromJSON(cls, js: str | TextIOWrapper):
+        """Deserialize saved filters."""
+        if type(js) == str:
+            info = json.loads(js)
+        else:
+            info = json.load(js)
+        filterer = cls()
+        for filter in info:
+            filterer.add(**filter)
+        return filterer

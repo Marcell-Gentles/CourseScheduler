@@ -1,7 +1,13 @@
 from datetime import time
-from data.priorities import PRIORITY_D
 import json
+import os
 from io import TextIOWrapper
+
+PRIORITY_PATH = os.path.join('data', 'priority.json')
+PRIORITY_D: dict
+
+with open(PRIORITY_PATH) as f:
+    PRIORITY_D = json.load(f)
 
 class Section:
     """Represents a section of a course, with course code, section
