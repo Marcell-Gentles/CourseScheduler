@@ -1,14 +1,5 @@
 from datetime import time
-
-# 0 for mandatory. The lowest numbers are weighted way more
-PRIORITY_D = {'ENGR079' : 0,
-              'ENGR079P' : 0,
-              'MATH055' : 1,
-              'CSCI070' : 1,
-              'LGCS010' : 2,
-              'MATH056' : 3,
-              'PHYS050' : 4,
-              'ENGR085' : 5}
+from priorities import PRIORITY_D
 
 class Schedule:
     """
