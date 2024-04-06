@@ -1,4 +1,4 @@
-from dataTypes import *
+from dataTypes import Schedule, Section
 from io import TextIOWrapper
 import datetime
 
@@ -73,9 +73,8 @@ def getSortedSchedules() -> list[Schedule]:
     starter parameters
     """
     # get sections from text file
-    f = open('courseData.txt', 'r')
-    sections = list(readSections(f).values())
-    f.close()
+    with open('data/courseData.txt', 'r') as f:
+        sections = list(readSections(f).values())
     # start off the recursive schedule generation
     blankSchedule = Schedule()
     schedules = makeSchedules(blankSchedule, sections)
@@ -85,18 +84,13 @@ def getSortedSchedules() -> list[Schedule]:
     return schedules
 
 
-def main():
-    """not at all the final main function. this is more for testing right now"""
-    schedules = getSortedSchedules()
-    perfectScore = schedules[0].score
-    print("Number of perfect schedules: {}\n".format(len([schedule for schedule in schedules
-                                                        if schedule.score == perfectScore])))
-    for schedule in getSortedSchedules()[:100]:
-        print(schedule.richSummary())
-        print()
-    
-
 def writeJSON():
+    import json
     schedules = getSortedSchedules()
-    with open('sortedSchedules.json', 'w') as f:
-        json.dump([schedule.toDictionary() for schedule in schedules], f, indent=2)
+    with open('data/sortedSchedules.json', 'w') as f:
+        json.dump([schedule.toDictionary() for schedule in schedules], f)
+
+if __name__ == "__main__":
+    # import sys
+    # if len(sys.argv) > 0 and sys.argv[1] == 'write':
+    writeJSON()

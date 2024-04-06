@@ -1,5 +1,5 @@
 from datetime import time
-from priorities import PRIORITY_D
+from data.priorities import PRIORITY_D
 import json
 from io import TextIOWrapper
 
