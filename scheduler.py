@@ -1,15 +1,16 @@
-from dataTypes import Schedule, Section
+from datatypes import Schedule, Section
 from io import TextIOWrapper
 import datetime
 import os
 
-JSON_WRITE_PATH = os.path.join('data', 'sortedSchedules.json')
-COURSE_DATA_PATH = os.path.join('data', 'courseData.txt')
 
-def readSections(f: TextIOWrapper) -> dict[str, list[Section]]:
-    """
-    Turn text data into a dictionary of lists of Sections of the same course
-    keyed by their code
+JSON_WRITE_PATH = os.path.join('data', 'sorted_schedules.json')
+COURSE_DATA_PATH = os.path.join('data', 'course_data.txt')
+
+
+def read_sections(f: TextIOWrapper) -> dict[str, list[Section]]:
+    """Turns text data into a dictionary of lists of Sections of the
+    same course keyed by their code.
     Text format:
     course
         section days startTime-endTime
@@ -29,70 +30,71 @@ def readSections(f: TextIOWrapper) -> dict[str, list[Section]]:
                 sections[course] = []
 
             else:   # indented section line under course line
-                sectionData = line.split()
-                section = sectionData[0]
-                days = [day for day in sectionData[1]]
+                section_data = line.split()
+                section = section_data[0]
+                days = [day for day in section_data[1]]
                 # turn the string times into time objects
-                startTime = sectionData[2][:4]
-                startTime = datetime.time(int(startTime[0:2]), int(startTime[2:4]))
-                endTime = sectionData[2][5:9]
-                endTime = datetime.time(int(endTime[0:2]), int(endTime[2:4]))
-                time = [startTime, endTime]
+                start_time = section_data[2][:4]
+                start_time = datetime.time(int(start_time[0:2]),
+                                           int(start_time[2:4]))
+                end_time = section_data[2][5:9]
+                end_time = datetime.time(int(end_time[0:2]),
+                                         int(end_time[2:4]))
+                time = [start_time, end_time]
                 sections[course].append(Section(course, section, days, time))
 
         line = f.readline()
     return sections
 
 
-def makeSchedules(existingSchedule: Schedule,
-                  coursesToAdd: list[list[Section]]) -> list[Schedule]:
+def make_schedules(existing_schedule: Schedule,
+                  courses_to_add: list[list[Section]]) -> list[Schedule]:
+    """Makes a list of schedules that contain each course no more than
+    one time. No schedule will be made that does not include the
+    mandatory courses.
     """
-    Make a list of schedules that contain each course no more than one time.
-    No schedule will be made that does not include the mandatory courses.
-    """
-    if coursesToAdd == []:          # bottom of recursion
-        return [existingSchedule]
+    if courses_to_add == []:          # bottom of recursion
+        return [existing_schedule]
     
     # each subtree includes one of the sections of that course
-    newSchedules = []
-    for section in coursesToAdd[0]: # from the current course group to add
-        if not section.conflictsWith(existingSchedule):
+    new_schedules = []
+    for section in courses_to_add[0]: # from the current course group to add
+        if not section.conflicts_with(existing_schedule):
             # add to the list all of the schedules that can be made by
             # including that section
             # this relies on add not being in place
-            newSchedules += makeSchedules(existingSchedule.add(section),
-                                          coursesToAdd[1:])
+            new_schedules += make_schedules(existing_schedule.add(section),
+                                            courses_to_add[1:])
     # we also consider not adding the course at all, unless mandatory
-    if not section.isMandatory():
-        newSchedules += makeSchedules(existingSchedule, coursesToAdd[1:])
+    if not section.is_mandatory():
+        new_schedules += make_schedules(existing_schedule, courses_to_add[1:])
     # now we have reached the end of the recursion and newSchedules has
     # every possible schedule
-    return newSchedules
+    return new_schedules
 
 
-def getSortedSchedules() -> list[Schedule]:
-    """
-    Facilitates the generation of schedules by getting sections from
+def get_sorted_schedules() -> list[Schedule]:
+    """Facilitates the generation of schedules by getting sections from
     courseData.txt and then wrapping the recursive makeSchedules with
     starter parameters
     """
     # get sections from text file
     with open(COURSE_DATA_PATH, 'r') as f:
-        sections = list(readSections(f).values())
+        sections = list(read_sections(f).values())
     # start off the recursive schedule generation
-    blankSchedule = Schedule()
-    schedules = makeSchedules(blankSchedule, sections)
+    blank_schedule = Schedule()
+    schedules = make_schedules(blank_schedule, sections)
     # remove empty schedules and sort them by score
-    schedules = list(filter(lambda x : len(x.sections) > 0, schedules))
-    schedules.sort(key = lambda sched : sched.score, reverse = True)
+    schedules = list(filter(lambda x: len(x.sections) > 0, schedules))
+    schedules.sort(key = lambda sched: sched.score, reverse = True)
     return schedules
 
 
 def writeJSON():
     import json
-    schedules = getSortedSchedules()
+    schedules = get_sorted_schedules()
     with open(JSON_WRITE_PATH, 'w') as f:
-        json.dump([schedule.toDictionary() for schedule in schedules], f)
+        json.dump([schedule.to_dictionary() for schedule in schedules], f)
 
 if __name__ == "__main__":
     # import sys
