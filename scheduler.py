@@ -99,4 +99,5 @@ def writeJSON():
 if __name__ == "__main__":
     # import sys
     # if len(sys.argv) > 0 and sys.argv[1] == 'write':
-    writeJSON()
+    #     writeJSON()
+    pass
