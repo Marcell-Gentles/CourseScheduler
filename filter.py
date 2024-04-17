@@ -101,9 +101,50 @@ class Filterer:
     def __init__(self):
         self.filter = lambda schedule: True
         self.filters: list[tuple[Callable, dict[str, str|list|dict]]] = []
+
+    def __repr__(self):
+        s = ''
+        for i, filter in enumerate(self.filters):
+            info = filter[1]
+            s += str(i) + ': kind: ' + info['kind'] + ' || args: ' \
+                        + str(info['args'])  + ' || kwargs:'\
+                        + str(info['kwargs']) + '\n'
+        return s
          
-    def add(self, kind: str, args: list, kwargs: dict):
-        """Add an active filter."""
+    def add(self, kind: str, args: list = [], kwargs: dict = {}):
+        """Add an active filter.
+        
+        Give the following arguments:
+        
+        kind: the string indicating the type of filter.
+
+        args: the list arguments for constructing that filter, if they exist.
+
+        kwargs: the dictionary of keyword arguments for constructing that
+                filter, if they exist.
+
+        Can recieve arguments of the forms .add('kind', [args], {kwargs}),
+        .add('kind', [args]), or .add('kind', kwargs={kwargs}), but not
+        .add('kind', {kwargs}).
+
+        To make things easier to remember, you can speciy passing arguments:
+        .add(kind='kind', args=[args], kwargs={kwargs}) where args and kwargs
+        are optional.
+
+        These are the valid arguments to pass ('kind' : (kw)args):
+
+        'time' : start=start_time, end=end_time (HHMM) (these are kwargs)
+
+        'score' : minimum_score
+
+        'courses_I' : courses <section.course string>
+
+        'courses_X' : courses <section.course string>
+
+        'sections_I' : [course<str>, section<str>]   # each arg is a list
+
+        'sections_X' : [course<str>, section<str>]   # must match exactly
+        """
         predicate = make_filter(kind, *args, **kwargs)
         self.filters.append((predicate,
                             {'kind': kind,
@@ -111,13 +152,35 @@ class Filterer:
                              'kwargs': kwargs}))
         self.filter = layer_filters(self.filter, predicate)
 
-    def remove(self, filter_info: dict[str, str|list|dict]):
-        """Remove from the active filters."""
-        for i, filter in enumerate(self.filters):
-            if filter[1] == filter_info:
-                del(self.filters[i])
-                break
+    def remove(self, filter_info: dict[str, str|list|dict] | int):
+        """Remove from the active filters.
+        
+        Pass the dictionary with all of the information about that filter
+        which is stored in self.filters along with the callable filters
+        itself.
+
+        Or pass the index in self.filters of the filter to delete
+        
+        With i as the index of that filter--info pair in the list
+        self.filters, the filter will be located in self.filters[i][1],
+        where self.filters[i][0] is the callable filter.
+        """
+        if type(filter_info) == int:
+            del(self.filters[i])
+        else:
+            for i, filter in enumerate(self.filters):
+                if filter[1] == filter_info:
+                    del(self.filters[i])
+                    break
         self.filter = layer_filters(*[pair[0] for pair in self.filters])
+    
+    def reset(self):
+        """Clears all filters from self."""
+        # Must use while loop instead of for loop because del in remove breaks
+        # indices.
+        while self.filters != []:
+            filter_info = self.filters[0][1]
+            self.remove(filter_info)
 
     # add optional file writing handled by the function (json.dump)
     def toJSON(self, f: TextIOWrapper | None = None) -> str | None:

@@ -3,9 +3,9 @@ from io import TextIOWrapper
 import datetime
 import os
 
-
-JSON_WRITE_PATH = os.path.join('data', 'sorted_schedules.json')
-COURSE_DATA_PATH = os.path.join('data', 'course_data.txt')
+DATA_FOLDER = 'data'
+JSON_WRITE_PATH = os.path.join(DATA_FOLDER, 'sorted_schedules.json')
+COURSE_DATA_PATH = os.path.join(DATA_FOLDER, 'course_data.txt')
 
 
 def read_sections(f: TextIOWrapper) -> dict[str, list[Section]]:

@@ -3,7 +3,8 @@ import json
 import os
 from io import TextIOWrapper
 
-PRIORITY_PATH = os.path.join('data', 'priority.json')
+DATA_FOLDER = 'data'
+PRIORITY_PATH = os.path.join(DATA_FOLDER, 'priority.json')
 PRIORITY_D: dict
 
 with open(PRIORITY_PATH) as f:
@@ -21,9 +22,9 @@ class Section:
         self.end_time: time = times[1]      # time
     
     def __repr__(self):
-        if len(self.section) < 3:
-            return "HM-".join([self.course, self.section])
-        else:
+        # if len(self.section) < 3:
+        #     return "HM-".join([self.course, self.section])
+        # else:
             return self.course + self.section[0:2] + '-' + self.section[2:4]
     
     def is_mandatory(self):
@@ -134,9 +135,23 @@ class Schedule:
                       + ' - ' + section.end_time.isoformat('minutes') + '\n')
         return s[:-1] # remove the last newline
     
-    def richSummary(self):
-        return self.__repr__(rich=True)
-
+    def summarize_daily(self):
+        sections = self.sections
+        by_day = {
+            day : sorted([section for section in sections if day in section.days],
+                        key = lambda x: x.start_time)
+            for day in ('M', 'T', 'W', 'R', 'F')
+        }
+        s = ''
+        for day in ('M', 'T', 'W', 'R', 'F'):
+            s += day + '\n'
+            for section in by_day[day]:
+                s += section.course + ' ' \
+                    + section.start_time.isoformat('minutes') \
+                    + ' - ' + section.end_time.isoformat('minutes') + '\n'
+            s += '\n'
+        return s
+    
     def copy(self):
         """Returns a copy of the schedule"""
         return Schedule(self.sections.copy(), self.score,

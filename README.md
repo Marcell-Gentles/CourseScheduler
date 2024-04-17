@@ -1,5 +1,7 @@
 # 5C Automatic Course Scheduler
 
+**This README is a bit outdated. I will update it soon. See `manual.md` for the latest guide to use.**
+
 This tool (in progress) finds schedules for you based on the courses you want to take, and how important they are to you. At this time, you have to provide the following data in the specified format to `data/courseData.txt`:
 ```
 COURSE_CODE
