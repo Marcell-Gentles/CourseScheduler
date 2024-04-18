@@ -57,13 +57,9 @@ def main():
         if inp == 'q':
             break
         elif inp == 'n':
-            print("Going to next page")
-            time.sleep(1)
             page_start += PAGE_SIZE
             continue
         elif inp == 'p':
-            print("Going to previous page")
-            time.sleep(1)
             page_start -= PAGE_SIZE
             continue
         
@@ -73,7 +69,7 @@ def main():
                 print(f'Schedule #{inp}:')
                 print(get_schedule(filtered_schedules, inp))
                 print()
-                input("Enter any value to return to the browser")
+                input("Press enter to return to the browser.")
                 continue
             except:
                 print("Invalid number")
@@ -164,4 +160,12 @@ def main():
             time.sleep(1)
             continue
 
-main()
+while True:
+    try:
+        main()
+    except:
+        inp = input("An error occurred. Press enter to restart or q to quit.")
+        if inp.lower() == 'q':
+            break
+        else:
+            continue

@@ -166,7 +166,7 @@ class Filterer:
         where self.filters[i][0] is the callable filter.
         """
         if type(filter_info) == int:
-            del(self.filters[i])
+            del(self.filters[filter_info])
         else:
             for i, filter in enumerate(self.filters):
                 if filter[1] == filter_info:
