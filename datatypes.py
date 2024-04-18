@@ -2,6 +2,7 @@ from datetime import time
 import json
 import os
 from io import TextIOWrapper
+from itertools import zip_longest
 
 DATA_FOLDER = 'data'
 PRIORITY_PATH = os.path.join(DATA_FOLDER, 'priority.json')
@@ -25,7 +26,9 @@ class Section:
         # if len(self.section) < 3:
         #     return "HM-".join([self.course, self.section])
         # else:
-            return self.course + self.section[0:2] + '-' + self.section[2:4]
+            return self.course + self.section[0:2] + ('-' + self.section[2:4]
+                                                      if len(self.section) > 2
+                                                      else '')
     
     def is_mandatory(self):
         # placeholder hard-code
@@ -138,18 +141,45 @@ class Schedule:
     def summarize_daily(self):
         sections = self.sections
         by_day = {
-            day : sorted([section for section in sections if day in section.days],
+            day : sorted([section for section in sections
+                          if day in section.days],
                         key = lambda x: x.start_time)
             for day in ('M', 'T', 'W', 'R', 'F')
         }
-        s = ''
+
+        lsts = []
+        s = '|'
         for day in ('M', 'T', 'W', 'R', 'F'):
-            s += day + '\n'
-            for section in by_day[day]:
-                s += section.course + ' ' \
-                    + section.start_time.isoformat('minutes') \
-                    + ' - ' + section.end_time.isoformat('minutes') + '\n'
+            lsts += [by_day[day]]
+            s += "{:^20}|".format(day)
+        s += '\n'
+        zipped = zip_longest(*lsts)
+        for line in zipped:
+            s += '|'
+            for day_section in line:
+                if day_section:
+                    s += "{0:<8} {1:<4}-{2:<4}|" \
+                            .format(day_section.course,
+                                    day_section.start_time.isoformat('minutes'),
+                                    day_section.end_time.isoformat('minutes'))
+                else:
+                    s += " " * 20 + '|'
             s += '\n'
+
+        # s = ''
+        # for unit in zipped:
+        #     s += '|'
+        #     for entry in unit:
+
+        # s = ''
+        # for day in ('M', 'T', 'W', 'R', 'F'):
+
+        #     s += day + '\n'
+        #     for section in by_day[day]:
+        #         s += section.course + ' ' \
+        #             + section.start_time.isoformat('minutes') \
+        #             + ' - ' + section.end_time.isoformat('minutes') + '\n'
+        #     s += '\n'
         return s
     
     def copy(self):

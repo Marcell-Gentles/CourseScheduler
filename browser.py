@@ -4,7 +4,7 @@ from filter import Filterer
 import time
 
 
-PAGE_SIZE = 10
+PAGE_SIZE = 6
 
 def make_page(schedules: list[Schedule], start, size=PAGE_SIZE):
     """Returns a page of size number of schedules starting at index
@@ -12,7 +12,7 @@ def make_page(schedules: list[Schedule], start, size=PAGE_SIZE):
     s = ''
     for i, schedule in enumerate(schedules[start:start+size]):
         s += f'#{i+start}\n'
-        s += str(schedule) + '\n\n' + schedule.summarize_daily() +'\n'
+        s += str(schedule) + '\n' + schedule.summarize_daily() +'\n'
     return s
 
 def get_schedule(schedules: list[Schedule], number: int):
@@ -46,7 +46,10 @@ def main():
         filtered_schedules = list(filter(f.filter, schedules))
         print()
         print(make_page(filtered_schedules, page_start))
-        print("Active filters" + '\n' + str(f) + '\n')
+        if f.filters:
+            print("Active filters" + '\n' + str(f) + '\n')
+        else:
+            print("No active filters\n")
         print(options_dialog)
         inp = input()
         print()
