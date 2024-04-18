@@ -4,7 +4,7 @@ from filter import Filterer
 import time
 
 
-PAGE_SIZE = 6
+PAGE_SIZE = 5
 
 def make_page(schedules: list[Schedule], start, size=PAGE_SIZE):
     """Returns a page of size number of schedules starting at index
