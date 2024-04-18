@@ -55,7 +55,7 @@ def main():
         print()
 
         if inp == 'q':
-            break
+            return 0
         elif inp == 'n':
             page_start += PAGE_SIZE
             continue
@@ -137,6 +137,8 @@ def main():
                     time.sleep(1)
                     continue
 
+                page_start = 0
+
             elif inp == 'rem':
                 print("Active filters:")
                 print(f)
@@ -152,8 +154,9 @@ def main():
             else:
                 print("Invalid filter operation")
                 time.sleep(1)
+                continue
             
-            continue
+            page_start = 0
         
         else:
             print("Invalid choice")
@@ -162,7 +165,8 @@ def main():
 
 while True:
     try:
-        main()
+        if main() == 0:
+            break
     except:
         inp = input("An error occurred. Press enter to restart or q to quit.")
         if inp.lower() == 'q':
