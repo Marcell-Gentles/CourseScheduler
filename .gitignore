@@ -5,3 +5,7 @@ sandbox.py
 
 .venv
 .vscode
+
+migrations/
+db.sqlite3
+old/
