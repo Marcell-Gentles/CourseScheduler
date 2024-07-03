@@ -1,11 +1,10 @@
-__pycache__/
-myStuff/
+__pycache__
 .DS_Store
 sandbox.py
 
 .venv
 .vscode
+.tmp
 
-migrations/
 db.sqlite3
-old/
+old
