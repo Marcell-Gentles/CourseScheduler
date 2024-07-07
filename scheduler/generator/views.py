@@ -1,13 +1,14 @@
 from django.shortcuts import render
 from django.http import HttpRequest, HttpResponse
-from .businesslogic.score_generate import make_schedules, score
+# from .businesslogic.score_generate import make_schedules, score
+from .models import Schedule
 
 # Create your views here.
 
 def generate_schedules(request: HttpRequest):
     # TODO: make sure a user has entered priorities (or set mandatory)
     # before proceeding
-    make_schedules(request.user)
+    Schedule.generate(request.user)
     return HttpResponse("Schedules created")
 
 

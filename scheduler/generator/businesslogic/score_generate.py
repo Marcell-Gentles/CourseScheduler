@@ -31,6 +31,7 @@ def fits_with(section: Section,
                      (other_occ.start_time >= occ.start_time
                       and other_occ.start_time <= occ.end_time))):
                         return False
+        return True
     elif type(other) == list:
         for other_section in other:
             if not fits_with(section, other_section):
