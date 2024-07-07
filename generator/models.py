@@ -6,6 +6,7 @@ from datetime import datetime, time as dt_time
 import copy
 from typing import Self
 
+from .constants import *
 
 class Department(models.Model):
     name = models.CharField("Department Name", max_length=30)
@@ -19,12 +20,6 @@ class Department(models.Model):
 class Course(models.Model):
     # the campus could be its own model,
     # but it is only used here
-    MUDD = "HM"
-    SCRIPPS = "KS"
-    CMC = "CM"
-    POMONA = "PO"
-    PITZER = "PZ"
-    OTHER = "XX"
     campuses = {
         MUDD: "MUDD",
         SCRIPPS: "SCRIPPS",
@@ -120,11 +115,6 @@ class Occurance(models.Model):
     """A single day's occurance of a section, so that different
     days can have different times
     """
-    MONDAY = "M"
-    TUESDAY = "T"
-    WEDNESDAY = "W"
-    THURSDAY = "R"
-    FRIDAY = "F"
     days = {
         MONDAY: "Monday",
         TUESDAY: "Tuesday",
