@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Scheduler</title>
+    <style>
+        #priorityform {
+            text-align: left;
+        }
+        .flex-container {
+            padding: 10px;
+            display: flex;
+        }
+        .flex-container > div {
+            /* margin: 10px; */
+            padding: 10px;
+        }
+        .priority-display {
+            padding: 10px;
+        }
+        #existing > ul {
+            text-align: center;
+            margin: auto;
+            list-style-type: none;
+        }
+        #current-edit {
+            background-color: #D3D3D3;
+        }
+        .priority-display > * {
+            padding: 15px;
+        }
+        .navbar {
+            background-color: #888888;
+            padding: 10px;
+        }
+        .navbar > ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+        .navbar > ul > li {
+            display: inline;
+            padding: 20px;
+            font-size: 150%;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <ul>
+            <li><a href="/priorities">Priorities</a></li>
+            <li><a href="/schedules">Schedules</a></li>
+        </ul>
+    </nav>
+
+    {% block content %}
+    {% endblock %}
+    
+</body>
+</html>

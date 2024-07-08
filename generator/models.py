@@ -1,7 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models import UniqueConstraint
+from django.core.exceptions import ValidationError
 
+from collections import Counter
 from datetime import datetime, time as dt_time
 import copy
 from typing import Self
@@ -54,14 +56,18 @@ class Course(models.Model):
 class CoursePriority(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    # A user can assemble a list of desired courses without yet deciding
-    # on priorities, but they must choose them before generating schedules
     level = models.SmallIntegerField("Priority level", blank=True, null=True)
     # a user doesn't need a priority if mandatory is true
     mandatory = models.BooleanField("Course is mandatory", default=False)
 
     def __str__(self):
         return f'{self.user} : {self.course} : {self.level}'
+    
+    def clean(self):
+        super().clean()
+        if not self.mandatory and self.level is None:
+            raise ValidationError("A non-mandatory course must have a "
+                                  "priority level")
     
     class Meta:
         verbose_name_plural = "Course Priorities"
@@ -225,7 +231,8 @@ class Schedule(models.Model):
             new_schedules += cls._generate_helper(existing_schedule,
                                                   courses_to_add[1:])
         # now we have reached the end of the recursion
-            return new_schedules
+        return new_schedules
+    
     @classmethod
     def generate(cls, user: User):
         courses_to_add: cls._SectionGroupList = []
@@ -241,7 +248,29 @@ class Schedule(models.Model):
             sched = Schedule(owner=user)
             sched.save()
             sched.sections.add(*s)
-            sched.calculate_score()        
+            sched.calculate_score()
+    
+    @staticmethod
+    def _are_duplicates(s1, s2):
+        # get list of each schedule's section primary keys
+        l1 = [s.pk for s in s1.sections.all()]
+        l2 = [s.pk for s in s2.sections.all()]
+        # hash -> count -> compare
+        return Counter(l1) == Counter(l2)
+    
+    @classmethod
+    def remove_duplicates(cls, user: User):
+        # expensive...use sparingly
+        # below is the same as user.schedule_set
+        schedules = list(cls.objects.filter(owner=user))
+        for s1 in schedules:
+            for s2 in schedules:
+                # not the same (pk) and neither has already been deleted
+                if s1 != s2 and s1.pk and s2.pk:
+                    if cls._are_duplicates(s1, s2):
+                        older: Schedule = sorted((s1, s2),
+                                                 key=lambda s: s.as_of)[0]
+                        older.delete()
 
 all_models = [
     Department,
