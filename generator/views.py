@@ -19,24 +19,21 @@ def generate_schedules(request: HttpRequest):
     return HttpResponse(response)
 
 @login_required
-def set_priorities(request: HttpRequest):
+def set_priorities(request: HttpRequest, **kwargs):
     if request.method == 'GET':
-        edit = False
-        if 'edit' in request.GET:
-            edit = True
-            pk = request.GET['pk']
+        pk = kwargs.get('pk')
+        if pk:  # edit mode
             form = PriorityForm(
                 instance=CoursePriority.objects.get(pk=pk)
             )
-        else:
+        else:   # create mode
             form = PriorityForm()
         user = request.user
         priorities = user.coursepriority_set.all()
-        # if priorities:      # the user has existing preferences
         context = {
             "priorities": priorities,
             "form": form,
-            "edit": edit
+            "pk": pk,
         }
         return render(request, "generator/priorities.html", context)
 
@@ -45,7 +42,7 @@ def set_priorities(request: HttpRequest):
         if form.is_valid():
             form_priority: CoursePriority = form.save(commit=False)
             # could be an edit or new
-            db_priority: CoursePriority = CoursePriority.objects.get_or_create(
+            db_priority, _ = CoursePriority.objects.get_or_create(
                 user=request.user, course=form_priority.course
             )
             db_priority.level = form_priority.level

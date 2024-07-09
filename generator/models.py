@@ -169,6 +169,9 @@ class Schedule(models.Model):
     as_of = models.DateTimeField(
         "Last scored", blank=True, null=True
     )
+    favorite = models.BooleanField(
+        "Is a favorite schedule of its owner", default=False
+    )
     
     def __str__(self):
         if self.score is None:

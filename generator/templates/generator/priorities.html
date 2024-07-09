@@ -5,14 +5,14 @@
 <h2>Existing Priorities</h2>
 <div id="existing" class="flex-container">
     {% for priority in priorities %}
-    <ul class="priority-display" {% if priority.pk|stringformat:"i" == request.GET.pk %}id="current-edit"{% endif %}>
+    <ul class="priority-display" {% if priority.pk == pk %}id="current-edit"{% endif %}>
         <li>Course: {{ priority.course}}</li>
         {% if priority.mandatory %}
         <li>Mandatory</li>
         {% else %}
         <li>Priority level {{ priority.level}}</li>
         {% endif %}
-        <a href="?edit&pk={{ priority.pk }}">
+        <a href="./{{ priority.pk }}">
             <button>Edit</button>
         </a>
     </ul>
@@ -20,18 +20,18 @@
 </div>
 <hr>
 <h2>
-    {% if edit %}Edit priority
+    {% if pk %}Edit priority
     {% else %}Add new priority
     {% endif %}
 </h2>
 <form id="priorityform" action="" method = "post">
     {% csrf_token %}
     {{ form.as_p }}
-    {% if edit %}
+    {% if pk %}
     <input type="submit" value="Confirm edit">
     <a href="."><button type="button">Add more priorities</button></a>
     {% else %}
-    <input type="submit" value="Submit and add another">
+    <input type="submit" value="Add priority">
     {% endif %}
 </form>
 <a href="../make"><button>Generate schedules</button></a>
