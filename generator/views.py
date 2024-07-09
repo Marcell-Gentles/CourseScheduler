@@ -44,7 +44,8 @@ def set_priorities(request: HttpRequest):
         form = PriorityForm(request.POST)
         if form.is_valid():
             form_priority: CoursePriority = form.save(commit=False)
-            db_priority: CoursePriority = CoursePriority.objects.get(
+            # could be an edit or new
+            db_priority: CoursePriority = CoursePriority.objects.get_or_create(
                 user=request.user, course=form_priority.course
             )
             db_priority.level = form_priority.level

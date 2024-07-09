@@ -3,6 +3,7 @@ from . import views
 
 urlpatterns = [
     path('make/', views.generate_schedules),
+    path('schedules/', views.browse_schedules),
     path('priorities/', views.set_priorities),
     # temporary
     path("", views.set_priorities),
