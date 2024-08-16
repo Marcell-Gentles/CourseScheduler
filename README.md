@@ -2,6 +2,8 @@
 
 This tool finds schedules for you based on the courses you want to take, and how important they are to you. It builds every possible schedule that inlcudes one section of each of the mandatory coures, as well as one section of zero or more other courses of interst. Each schedule gets a score based on the courses it includes. This score is determined from the priorities you provide for each course. You can view and filter schedules in the browser. See [`manual.md`](manual.md).
 
+<img width="900" alt="course-scheduler-demo" src="https://github.com/user-attachments/assets/6af9fb5d-0e18-4a11-9160-4dc9d421407c">
+
 ## Future
 
 I plan to improve the user experience for inputting section and course information, and to provide a web interface for browsing and filtering sorted schedules.
